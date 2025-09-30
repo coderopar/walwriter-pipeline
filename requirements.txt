@@ -1,0 +1,12 @@
+# Core async networking
+websockets>=12.0
+httpx>=0.27
+
+# JSON & serialization
+orjson>=3.10
+
+# Config parsing
+PyYAML>=6.0
+
+# (Optional but recommended for perf/compatibility)
+uvloop; sys_platform != "win32"

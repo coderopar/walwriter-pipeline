@@ -1,0 +1,41 @@
+# --- Global knobs ---
+log_level: INFO          # DEBUG | INFO | WARNING | ERROR
+
+# --- WAL writer knobs (no compression) ---
+wal:
+  base_dir: ./data/bronze
+  rotate_bytes: 134217728   # 128 MiB
+  fsync_interval: 10.0      # seconds
+  rotate_sec: null          # seconds; null disables time-based rotation
+  write_queue_maxsize: 200000
+  batch_max_records: 1024
+  batch_max_bytes: 1048576  # 1 MiB
+  io_workers: 1
+  raw_mode: true            # store exact inbound frames; fastest & smallest CPU cost
+
+# --- NEW: background compressor for closed WAL segments ---
+wal_compressor:
+  enabled: true
+  min_age_sec: 30           # only compress segments idle for >= 30s
+  interval_sec: 10          # rescan cadence
+  level: 10                 # zstd level 1..22 (higher = smaller, slower)
+  threads: 0                # 0 = auto (let zstd decide)
+  delete_original: true     # remove .ndjson after successful compression
+
+# --- Stream shards (combined WebSocket) ---
+streams:
+  wal_write_raw: true
+  shards:
+    - id: shard-0
+      # Example: BTCUSDT depth+markPrice+aggTrade. Add streams separated by "/".
+      url: "wss://fstream.binance.com/stream?streams=btcusdt@depth@100ms/btcusdt@markPrice@1s/btcusdt@aggTrade"
+
+# --- Orderbooks to maintain (consume from router) ---
+orderbooks:
+  - symbol: BTCUSDT
+    speed: 250ms
+    periodic_resync_sec: 1800
+    snapshotter:
+      enabled: true
+      interval_sec: 5.0
+      top_n: 25
