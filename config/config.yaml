@@ -4,7 +4,7 @@ log_level: INFO          # DEBUG | INFO | WARNING | ERROR
 # --- WAL writer knobs (no compression) ---
 wal:
   base_dir: ./data/bronze
-  rotate_bytes: 134217728   # 128 MiB
+  rotate_bytes: 67108864   # 128 MiB
   fsync_interval: 10.0      # seconds
   rotate_sec: null          # seconds; null disables time-based rotation
   write_queue_maxsize: 200000
